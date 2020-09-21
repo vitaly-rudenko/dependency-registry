@@ -5,12 +5,10 @@
   "files": [
     "*",
     "lib/{,**}/*",
-    "dist/{,**}/*",
     "spec/{,**}/*"
   ],
   "mutate": [
-    "lib/{,**}/*.js",
-    "dist/{,**}/*.js"
+    "lib/{,**}/*.js"
   ],
   "reporters": [
     "html",
