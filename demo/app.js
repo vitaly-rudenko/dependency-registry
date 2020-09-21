@@ -13,13 +13,7 @@ const dependencyRegistry = new DependencyRegistry();
 dependencyRegistry.registerInstance(new EventUrlBuilder({ baseUrl: 'http://events-api' }));
 
 dependencyRegistry.registerFactory(VideoDevice);
-dependencyRegistry.registerFactory(Ffmpeg);
 dependencyRegistry.registerFactory(ChromiumDriver);
-
-// usage: ffmpegWrapperFactory.create()
-dependencyRegistry.registerFactory(
-    FfmpegWrapper, (dependencies) => new FfmpegWrapper(dependencies)
-);
 
 // usage: chromiumFactory.create(options)
 dependencyRegistry.registerFactory(
@@ -30,6 +24,15 @@ dependencyRegistry.registerFactory(
 dependencyRegistry.registerFactory(
     EventCapturer, (dependencies, options) => new EventCapturer(options, dependencies)
 );
+
+dependencyRegistry.registerFactory(Ffmpeg);
+
+// importing other registries
+const ffmpegDependencyRegistry = new DependencyRegistry();
+ffmpegDependencyRegistry.registerFactory(
+    FfmpegWrapper, (dependencies) => new FfmpegWrapper(dependencies)
+);
+dependencyRegistry.import(ffmpegDependencyRegistry);
 
 // More examples:
 
@@ -72,8 +75,8 @@ dependencyRegistry.registerFactory(
  * ```
  *
  * NOTE:
- * `DependencyRegistry#export()` returns a Proxy, so it's not a simple object.
- * You can't do things like `{ ... dependencies }`, `Object.entries(dependencies)`, etc.
+ * `DependencyRegistry#export()` returns a Proxy, not a simple object.
+ * This means that you can't do things like `{ ... dependencies }`, `Object.entries(dependencies)`, etc.
  */
 
 const eventCapturingManager = new EventCapturingManager(dependencyRegistry.export());

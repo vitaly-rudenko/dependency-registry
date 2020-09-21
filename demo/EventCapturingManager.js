@@ -1,5 +1,5 @@
 class EventCapturingManager {
-    constructor({ eventCapturerFactory, eventUrlBuilder }) {
+    constructor({ eventUrlBuilder, eventCapturerFactory }) {
         this._eventUrlBuilder = eventUrlBuilder;
         this._eventCapturerFactory = eventCapturerFactory;
 
