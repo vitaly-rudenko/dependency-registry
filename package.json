@@ -3,7 +3,7 @@
   "author": "Vitaly Rudenko",
   "version": "1.0.0",
   "description": "",
-  "main": "demo/app.js",
+  "main": "index.js",
   "scripts": {
     "demo": "node demo/app.js",
     "test": "jasmine --config=spec/support/jasmine.json",
