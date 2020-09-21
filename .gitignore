@@ -1,0 +1,8 @@
+node_modules/
+reports/
+.stryker-tmp
+
+.DS_Store
+Thumbs.db
+.vscode
+npm-debug.log

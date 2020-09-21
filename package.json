@@ -1,11 +1,32 @@
 {
-  "name": "dependency-registry-experiment",
+  "name": "di-framework",
+  "author": "Vitaly Rudenko",
   "version": "1.0.0",
   "description": "",
   "main": "demo/app.js",
   "scripts": {
-    "start": "node demo/app.js"
+    "demo": "node demo/app.js",
+    "test": "jasmine --config=spec/support/jasmine.json",
+    "test:watch": "node_modules/.bin/nodemon -x 'npm test'"
   },
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "@stryker-mutator/core": "3.3.1",
+    "@stryker-mutator/jasmine-framework": "3.3.1",
+    "@stryker-mutator/jasmine-runner": "3.3.1",
+    "@stryker-mutator/javascript-mutator": "3.3.1",
+    "jasmine": "3.6.1",
+    "nodemon": "2.0.4"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "node_modules",
+      "package.json",
+      ".git"
+    ],
+    "delay": "500",
+    "legacyWatch": false,
+    "signal": "SIGTERM",
+    "ext": "js"
+  },
+  "license": "UNLICENSED"
 }
