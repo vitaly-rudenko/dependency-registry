@@ -76,9 +76,11 @@ dependencyRegistry.import(ffmpegDependencyRegistry);
  * NOTE:
  * `DependencyRegistry#export()` returns a Proxy, not a simple object.
  * This means that you can't do things like `{ ... dependencies }`, `Object.entries(dependencies)`, etc.
+ * You can't even execute "console.log(dependencies)"
  */
 
-const eventCapturingManager = new EventCapturingManager(dependencyRegistry.export());
+const dependencies = dependencyRegistry.export();
+const eventCapturingManager = new EventCapturingManager(dependencies);
 
 eventCapturingManager.startCapturing(
     'fake-event-id',
