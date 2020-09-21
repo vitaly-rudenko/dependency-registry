@@ -25,10 +25,9 @@ dependencyRegistry.registerFactory(
     EventCapturer, (dependencies, options) => new EventCapturer(options, dependencies)
 );
 
-dependencyRegistry.registerFactory(Ffmpeg);
-
 // importing other registries
 const ffmpegDependencyRegistry = new DependencyRegistry();
+ffmpegDependencyRegistry.registerFactory(Ffmpeg);
 ffmpegDependencyRegistry.registerFactory(
     FfmpegWrapper, (dependencies) => new FfmpegWrapper(dependencies)
 );
