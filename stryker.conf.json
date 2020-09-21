@@ -2,6 +2,16 @@
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "mutator": "javascript",
   "packageManager": "npm",
+  "files": [
+    "*",
+    "lib/{,**}/*",
+    "dist/{,**}/*",
+    "spec/{,**}/*"
+  ],
+  "mutate": [
+    "lib/{,**}/*.js",
+    "dist/{,**}/*.js"
+  ],
   "reporters": [
     "html",
     "clear-text",
