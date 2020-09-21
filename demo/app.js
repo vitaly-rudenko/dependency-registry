@@ -54,7 +54,6 @@ dependencyRegistry.registerFactory(
  * - videoDeviceFactory
  * - ffmpegFactory
  * - chromiumDriverFactory
- * - customFactory
  * - ffmpegWrapperFactory
  * - chromiumFactory
  * - eventCapturerFactory
