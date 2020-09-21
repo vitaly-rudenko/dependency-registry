@@ -1,7 +1,5 @@
 class FfmpegWrapper {
-    constructor({ ffmpegFactory, dependencyValidator }) {
-        dependencyValidator.require({ ffmpegFactory });
-
+    constructor({ ffmpegFactory }) {
         this._ffmpegFactory = ffmpegFactory;
     }
 

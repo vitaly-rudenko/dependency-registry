@@ -1,5 +1,4 @@
 const DependencyRegistry = require('../lib/DependencyRegistry');
-const DependencyValidator = require('../lib/DependencyValidator');
 const Chromium = require('./Chromium');
 const EventCapturer = require('./EventCapturer');
 const EventCapturingManager = require('./EventCapturingManager');
@@ -11,58 +10,62 @@ const VideoDevice = require('./VideoDevice');
 
 const dependencyRegistry = new DependencyRegistry();
 
-// vendor / non-class instances
-dependencyRegistry.registerNamedInstance('dependencyValidator', new DependencyValidator());
-
-// class instances
 dependencyRegistry.registerInstance(new EventUrlBuilder({ baseUrl: 'http://events-api' }));
 
-// simple classes
 dependencyRegistry.registerFactory(VideoDevice);
 dependencyRegistry.registerFactory(Ffmpeg);
+dependencyRegistry.registerFactory(ChromiumDriver);
 
-// vendor / non-classes / simple classes without dependencies
-dependencyRegistry.registerSimpleProvider(
-    'chromiumDriver', () => new ChromiumDriver()
+// usage: ffmpegWrapperFactory.create()
+dependencyRegistry.registerFactory(
+    FfmpegWrapper, (dependencies) => new FfmpegWrapper(dependencies)
 );
 
-// classes with complex dependencies
-dependencyRegistry.registerComplexProvider(
-    'customName',
-    (dependencies) => () => new FfmpegWrapper(dependencies)
+// usage: chromiumFactory.create(options)
+dependencyRegistry.registerFactory(
+    Chromium, (dependencies, options) => new Chromium(options, dependencies)
 );
-dependencyRegistry.registerComplexProvider(
-    FfmpegWrapper,
-    (dependencies) => () => new FfmpegWrapper(dependencies)
+
+// usage: eventCapturerFactory.create(options)
+dependencyRegistry.registerFactory(
+    EventCapturer, (dependencies, options) => new EventCapturer(options, dependencies)
 );
-dependencyRegistry.registerComplexProvider(
-    Chromium,
-    (dependencies) => (options) => new Chromium(options, dependencies)
-);
-dependencyRegistry.registerComplexProvider(
-    EventCapturer,
-    (dependencies) => (options) => new EventCapturer(options, dependencies)
-);
+
+// More examples:
+
+// dependencyRegistry.registerInstance('amqplib', amqplib)
+// dependencyRegistry.registerInstance('fs', require('fs-extra'))
+
+// usage: expressRouterFactory.create(...args)
+// dependencyRegistry.registerFactory(
+//     'expressRouterFactory',
+//     (dependencies, ...args) => express.Router(...args)
+// );
+
+// usage: billingProvider.factory.create(10, 'days')
+// dependencyRegistry.registerFactory(
+//     BillingProvider,
+//     (dependencies, amount, units) => new BillingProvider(amount, units, dependencies)
+// );
 
 /**
  * Registered dependencies:
- * - dependencyValidator
  * - eventUrlBuilder
  * - videoDeviceFactory
  * - ffmpegFactory
- * - chromiumDriverProvider
- * - customNameProvider
- * - ffmpegWrapperProvider
- * - chromiumProvider
- * - eventCapturerProvider
+ * - chromiumDriverFactory
+ * - customFactory
+ * - ffmpegWrapperFactory
+ * - chromiumFactory
+ * - eventCapturerFactory
  *
  * ```js
- * const { eventUrlBuilder, ffmpegFactory, chromiumProvider } = dependencyRegistry.export();
+ * const { eventUrlBuilder, ffmpegFactory, chromiumFactory } = dependencyRegistry.export();
  *
  * console.log(
  *     eventUrlBuilder,
  *     ffmpegFactory.create(),
- *     chromiumProvider.create({ width: 1280, height: 720 })
+ *     chromiumFactory.create({ width: 1280, height: 720 })
  * );
  *
  * dependencies.unknownDependency // throws an error

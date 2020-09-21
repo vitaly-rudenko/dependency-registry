@@ -1,10 +1,8 @@
 class Chromium {
-    constructor({ width, height }, { chromiumDriverProvider, dependencyValidator }) {
-        dependencyValidator.require({ chromiumDriverProvider });
-
+    constructor({ width, height }, { chromiumDriverFactory }) {
         this._width = width;
         this._height = height;
-        this._chromiumDriver = chromiumDriverProvider.create();
+        this._chromiumDriver = chromiumDriverFactory.create();
     }
 
     start() {

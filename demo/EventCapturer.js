@@ -4,21 +4,14 @@ class EventCapturer {
         width,
         height,
     }, {
-        chromiumProvider,
-        ffmpegWrapperProvider,
+        chromiumFactory,
+        ffmpegWrapperFactory,
         videoDeviceFactory,
-        dependencyValidator,
     }) {
-        dependencyValidator.require({
-            chromiumProvider,
-            ffmpegWrapperProvider,
-            videoDeviceFactory,
-        });
-
         this._url = url;
 
-        this._chromium = chromiumProvider.create({ width, height });
-        this._ffmpegWrapper = ffmpegWrapperProvider.create({ width, height });
+        this._chromium = chromiumFactory.create({ width, height });
+        this._ffmpegWrapper = ffmpegWrapperFactory.create({ width, height });
         this._videoDevice = videoDeviceFactory.create();
     }
 

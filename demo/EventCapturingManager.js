@@ -1,18 +1,13 @@
 class EventCapturingManager {
-    constructor({ eventCapturerProvider, eventUrlBuilder, dependencyValidator }) {
-        dependencyValidator.require({
-            eventCapturerProvider,
-            eventUrlBuilder,
-        });
-
+    constructor({ eventCapturerFactory, eventUrlBuilder }) {
         this._eventUrlBuilder = eventUrlBuilder;
-        this._eventCapturerProvider = eventCapturerProvider;
+        this._eventCapturerFactory = eventCapturerFactory;
 
         this._eventCapturerMap = new Map();
     }
 
     startCapturing(eventId, { width, height }) {
-        const eventCapturer = this._eventCapturerProvider.create({
+        const eventCapturer = this._eventCapturerFactory.create({
             url: this._eventUrlBuilder.build(eventId),
             width,
             height
