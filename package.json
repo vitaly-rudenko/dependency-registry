@@ -1,0 +1,11 @@
+{
+  "name": "dependency-registry-experiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "demo/app.js",
+  "scripts": {
+    "start": "node demo/app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
