@@ -54,7 +54,7 @@ describe('DependencyRegistry', () => {
             expect(() => dependencyRegistry.registerInstance([1, 2, 3]))
                 .toThrowError('Invalid instance: "1,2,3" (must be a class or a class instance)');
 
-            expect(() => dependencyRegistry.registerInstance(Symbol.for('something')))
+            expect(() => dependencyRegistry.registerInstance(Symbol('something')))
                 .toThrowError('Invalid instance: "Symbol(something)" (must be a class or a class instance)');
         });
 
@@ -74,6 +74,18 @@ describe('DependencyRegistry', () => {
 
             expect(() => dependencyRegistry.registerInstance({ hello: 'world' }, instance))
                 .toThrowError('Invalid instance identifier: "[object Object]" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance(null, instance))
+                .toThrowError('Invalid instance identifier: "null" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance(undefined, instance))
+                .toThrowError('Invalid instance identifier: "undefined" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance(true, instance))
+                .toThrowError('Invalid instance identifier: "true" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance('', instance))
+                .toThrowError('Invalid instance identifier: "" (must be a string)');
 
             expect(() => dependencyRegistry.registerInstance(Symbol('hello world'), instance))
                 .toThrowError('Invalid instance identifier: "Symbol(hello world)" (must be a string)');
@@ -133,7 +145,47 @@ describe('DependencyRegistry', () => {
             );
         });
 
-        it('should register a dependent factory for the provided class and factory method', () => {
+        it('should throw an error when provided object is not a class', () => {
+            class MyClass {}
+
+            expect(() => dependencyRegistry.registerFactory(() => {}))
+                .toThrowError('Invalid factory class: "() => {}" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(function() {}))
+                .toThrowError('Invalid factory class: "function() {}" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(function SomeFunction() {}))
+                .toThrowError('Invalid factory class: "function SomeFunction() {}" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory({ fake: 'object' }))
+                .toThrowError('Invalid factory class: "[object Object]" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(123))
+                .toThrowError('Invalid factory class: "123" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(true))
+                .toThrowError('Invalid factory class: "true" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory('hello world'))
+                .toThrowError('Invalid factory class: "hello world" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(undefined))
+                .toThrowError('Invalid factory class: "undefined" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(null))
+                .toThrowError('Invalid factory class: "null" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory([1, 2, 3]))
+                .toThrowError('Invalid factory class: "1,2,3" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(Symbol('something')))
+                .toThrowError('Invalid factory class: "Symbol(something)" (must be a class)');
+
+            expect(() => dependencyRegistry.registerFactory(new MyClass()))
+                .toThrowError('Invalid factory class: "[object Object]" (must be a class)');
+        });
+
+        it('should register a dependent factory for the provided class', () => {
             class MyClass {
                 constructor(...args) {
                     this.args = args;
@@ -155,7 +207,7 @@ describe('DependencyRegistry', () => {
             );
         });
 
-        it('should register a dependent factory with the specified name', () => {
+        it('should register a dependent factory with a custom name', () => {
             class MyClass {
                 constructor(...args) {
                     this.args = args;
@@ -177,6 +229,69 @@ describe('DependencyRegistry', () => {
             );
         });
 
+        it('should throw an error when factory method is not a function', () => {
+            class MyClass {}
+
+            expect(() => dependencyRegistry.registerFactory('someFactory', { fake: 'object' }))
+                .toThrowError('Invalid factory method: "[object Object]" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory(MyClass, 123))
+                .toThrowError('Invalid factory method: "123" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory('someFactory', 'hello world'))
+                .toThrowError('Invalid factory method: "hello world" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory(MyClass, undefined))
+                .toThrowError('Invalid factory method: "undefined" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory(MyClass, true))
+                .toThrowError('Invalid factory method: "true" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory('someFactory', null))
+                .toThrowError('Invalid factory method: "null" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory(MyClass, [1, 2, 3]))
+                .toThrowError('Invalid factory method: "1,2,3" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory('someFactory', Symbol('something')))
+                .toThrowError('Invalid factory method: "Symbol(something)" (must be a function)');
+
+            expect(() => dependencyRegistry.registerFactory(MyClass, new MyClass()))
+                .toThrowError('Invalid factory method: "[object Object]" (must be a function)');
+        });
+
+        it('should throw an error when provided identifier is not a class or a string', () => {
+            expect(() => dependencyRegistry.registerFactory(Symbol('hello world'), () => {}))
+                .toThrowError('Invalid factory identifier: "Symbol(hello world)" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(123, () => {}))
+                .toThrowError('Invalid factory identifier: "123" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(null, () => {}))
+                .toThrowError('Invalid factory identifier: "null" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(undefined, () => {}))
+                .toThrowError('Invalid factory identifier: "undefined" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory('', () => {}))
+                .toThrowError('Invalid factory identifier: "" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(true, () => {}))
+                .toThrowError('Invalid factory identifier: "true" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory([1, 2, 3], () => {}))
+                .toThrowError('Invalid factory identifier: "1,2,3" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory({ fake: 'object' }, () => {}))
+                .toThrowError('Invalid factory identifier: "[object Object]" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(function SomeFunction() {}, () => {}))
+                .toThrowError('Invalid factory identifier: "function SomeFunction() {}" (must be a class or a string)');
+
+            expect(() => dependencyRegistry.registerFactory(() => {}, () => {}))
+                .toThrowError('Invalid factory identifier: "() => {}" (must be a class or a string)');
+        });
+
         it('should throw an error when factory is already registered', () => {
             class MyClass {}
 
@@ -188,6 +303,19 @@ describe('DependencyRegistry', () => {
 
             expect(() => dependencyRegistry.registerFactory('someFactory', () => {}))
                 .toThrowError('Dependency is already registered: "someFactory"');
+        });
+
+        it('should throw an error when arguments count is invalid', () => {
+            class MyClass {}
+
+            const errorMessage = 'Invalid factory registration arguments';
+
+            expect(() => dependencyRegistry.registerFactory())
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerFactory('hello', () => {}, true))
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerFactory(MyClass, () => {}, true, 123))
+                .toThrowError(errorMessage);
         });
     });
 
