@@ -26,12 +26,60 @@ describe('DependencyRegistry', () => {
             expect(dependencyRegistry.export().myClass).toBe(MyClass);
         });
 
+        it('should throw an error for invalid instances when name is not specified', () => {
+            expect(() => dependencyRegistry.registerInstance(() => {}))
+                .toThrowError('Invalid instance: "() => {}" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(function() {}))
+                .toThrowError('Invalid instance: "function() {}" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(function SomeFunction() {}))
+                .toThrowError('Invalid instance: "function SomeFunction() {}" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance({ fake: 'object' }))
+                .toThrowError('Invalid instance: "[object Object]" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(123))
+                .toThrowError('Invalid instance: "123" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance('hello world'))
+                .toThrowError('Invalid instance: "hello world" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(undefined))
+                .toThrowError('Invalid instance: "undefined" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(null))
+                .toThrowError('Invalid instance: "null" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance([1, 2, 3]))
+                .toThrowError('Invalid instance: "1,2,3" (must be a class or a class instance)');
+
+            expect(() => dependencyRegistry.registerInstance(Symbol.for('something')))
+                .toThrowError('Invalid instance: "Symbol(something)" (must be a class or a class instance)');
+        });
+
         it('should register an object using the specified name', () => {
             const instance = { fake: 'instance' };
 
             dependencyRegistry.registerInstance('someInstance', instance);
 
             expect(dependencyRegistry.export().someInstance).toBe(instance);
+        });
+
+        it('should throw an error when the specified name is invalid', () => {
+            const instance = { fake: 'instance' };
+
+            expect(() => dependencyRegistry.registerInstance(123, instance))
+                .toThrowError('Invalid instance identifier: "123" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance({ hello: 'world' }, instance))
+                .toThrowError('Invalid instance identifier: "[object Object]" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance(Symbol('hello world'), instance))
+                .toThrowError('Invalid instance identifier: "Symbol(hello world)" (must be a string)');
+
+            expect(() => dependencyRegistry.registerInstance([1, 2, 3], instance))
+                .toThrowError('Invalid instance identifier: "1,2,3" (must be a string)');
         });
 
         it('should throw an error when instance is already registered', () => {
@@ -55,6 +103,17 @@ describe('DependencyRegistry', () => {
             expect(() => dependencyRegistry.registerInstance('someInstance', { fake: 'someOtherInstance' }))
                 .toThrowError('Dependency is already registered: "someInstance"');
         });
+
+        it('should throw an error when arguments count is invalid', () => {
+            const errorMessage = 'Invalid instance registration arguments';
+
+            expect(() => dependencyRegistry.registerInstance())
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerInstance('hello', { fake: 'object' }, true))
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerInstance('hello', { fake: 'object' }, true, 123))
+                .toThrowError(errorMessage);
+        });
     });
 
     describe('registerFactory()', () => {
@@ -74,7 +133,7 @@ describe('DependencyRegistry', () => {
             );
         });
 
-        it('should register a dependent factory for the provided class', () => {
+        it('should register a dependent factory for the provided class and factory method', () => {
             class MyClass {
                 constructor(...args) {
                     this.args = args;
@@ -122,7 +181,7 @@ describe('DependencyRegistry', () => {
             class MyClass {}
 
             dependencyRegistry.registerFactory(MyClass);
-            dependencyRegistry.registerFactory('someFactory', { fake: 'someFactory' });
+            dependencyRegistry.registerFactory('someFactory', () => { fake: 'someFactory' });
 
             expect(() => dependencyRegistry.registerFactory(MyClass))
                 .toThrowError('Dependency is already registered: "myClassFactory"');
