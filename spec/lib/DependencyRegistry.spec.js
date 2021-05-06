@@ -325,10 +325,6 @@ describe('DependencyRegistry', () => {
 
             expect(() => dependencies['']).toThrowError('Unsupported action');
             expect(() => dependencies[Symbol('hello')]).toThrowError('Unsupported action: Symbol(hello)');
-
-            const unsupportedActionErrorMessageRegex = /^Unsupported action: .+$/;
-
-            expect(() => console.log(dependencies)).toThrowError(unsupportedActionErrorMessageRegex);
         });
 
         it('should throw an error for non-existing dependencies', () => {
