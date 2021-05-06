@@ -1,0 +1,11 @@
+{
+    "ignore": [
+        "node_modules",
+        "package.json",
+        ".git"
+    ],
+    "delay": "500",
+    "legacyWatch": false,
+    "signal": "SIGTERM",
+    "ext": "js"
+}

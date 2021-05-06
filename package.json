@@ -1,33 +1,20 @@
 {
-  "name": "di-framework",
-  "author": "Vitaly Rudenko",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "demo": "node demo/app.js",
-    "test": "jasmine --config=spec/support/jasmine.json",
-    "test:watch": "node_modules/.bin/nodemon -x 'npm test'",
-    "mutation-test": "stryker run"
-  },
-  "devDependencies": {
-    "@stryker-mutator/core": "3.3.1",
-    "@stryker-mutator/jasmine-framework": "3.3.1",
-    "@stryker-mutator/jasmine-runner": "3.3.1",
-    "@stryker-mutator/javascript-mutator": "3.3.1",
-    "jasmine": "3.6.1",
-    "nodemon": "2.0.4"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "node_modules",
-      "package.json",
-      ".git"
-    ],
-    "delay": "500",
-    "legacyWatch": false,
-    "signal": "SIGTERM",
-    "ext": "js"
-  },
-  "license": "UNLICENSED"
+    "version": "1.0.0",
+    "name": "@vitalyrudenko/dependency-registry",
+    "description": "Tiny JavaScript dependency registry",
+    "author": "Vitaly Rudenko",
+    "license": "MIT",
+    "main": "index.js",
+    "scripts": {
+        "test": "jasmine --config=spec/support/jasmine.json",
+        "test:watch": "nodemon -x 'npm test'",
+        "test:mutate": "stryker run"
+    },
+    "devDependencies": {
+        "@stryker-mutator/core": "^4.6.0",
+        "@stryker-mutator/jasmine-runner": "^4.6.0",
+        "@stryker-mutator/javascript-mutator": "^4.0.0",
+        "jasmine": "^3.7.0",
+        "nodemon": "^2.0.7"
+    }
 }
