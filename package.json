@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-pre.2",
+    "version": "1.0.0",
     "name": "@vitalyrudenko/dependency-registry",
     "description": "Tiny JavaScript dependency registry",
     "author": "Vitaly Rudenko",
