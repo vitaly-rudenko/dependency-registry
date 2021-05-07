@@ -36,7 +36,7 @@ class House {
             windows,
             door
         }, {
-            apiKey: config.providedSecurity.apiKey,
+            apiKey: config.apiKey,
         });
     }
 
@@ -143,8 +143,10 @@ In order to do that, we need to specify how to instantiate every class:
 const registry = new DependencyRegistry();
 
 registry.registerFactory(House, (deps, attributes) => new House(attributes, deps));
-
-registry.registerFactory('securityFactory', (deps, attributes) => new ProvidedSecurity(attributes, { apiKey: config.providedSecurity.apiKey }));
+registry.registerFactory(
+    'securityFactory',
+    (deps, attributes) => new ProvidedSecurity(attributes, { apiKey: config.apiKey })
+);
 
 registry.registerFactory(Window, (deps, attributes) => new Window(deps));
 registry.registerFactory(WindowHandle, (deps, attributes) => new WindowHandle(deps));
@@ -160,7 +162,7 @@ const houseBuilder = new HouseBuilder(
 const house = houseBuilder.build(new Person('John Doe'));
 ```
 
-Now we need to update our classes to use our generated factories:
+Now we need to update our classes to use the factories to create instances:
 ```js
 class HouseBuilder {
     constructor(
@@ -186,7 +188,8 @@ class HouseBuilder {
         });
     }
 }
-
+```
+```js
 class House {
     constructor({ owner, windows, door }, { securityFactory }) {
         this._security = securityFactory.create({
@@ -203,7 +206,8 @@ class House {
         }
     }
 }
-
+```
+```js
 class Window {
     constructor({ windowHandleFactory }) {
         this._windowHandle = windowHandleFactory.create();
