@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.0-pre.1",
     "name": "@vitalyrudenko/dependency-registry",
     "description": "Tiny JavaScript dependency registry",
     "author": "Vitaly Rudenko",
@@ -16,5 +16,8 @@
         "@stryker-mutator/javascript-mutator": "^4.0.0",
         "jasmine": "^3.7.0",
         "nodemon": "^2.0.7"
-    }
+    },
+    "files": [
+        "lib/"
+    ]
 }
