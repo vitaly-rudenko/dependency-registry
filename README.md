@@ -1,5 +1,137 @@
 # @vitalyrudenko/dependency-registry
 
+## Usage
+
+### Installation
+
+```
+npm i @vitalyrudenko/dependency-registry
+```
+
+### Initialize the registry
+
+```js
+const { DependencyRegistry } = require('@vitalyrudenko/dependency-registry');
+
+const registry = new DependencyRegistry();
+```
+
+#### Values
+
+```js
+registry.registerValue('externalApiKey', config.external.apiKey);
+
+const { externalApiKey } = registry.export();
+```
+
+#### Instances
+
+##### Class instances
+
+> The name of the instance is automatically generated from the class name.
+
+```js
+registry.registerInstance(new House());
+
+const { house } = registry.export();
+```
+
+##### Named instances
+```js
+registry.registerInstance('myHouse', new House());
+registry.registerInstance('pgPool', pg.createPool());
+
+const { myHouse, pgPool } = registry.export();
+```
+
+#### Factories
+
+##### Simple class factories
+
+> The name of the factory is automatically generated from the class name.
+
+```js
+class MyClass {
+    constructor(a, b, c) {
+        console.log('test:', a, b, c);
+    }
+}
+
+registry.registerFactory(MyClass);
+
+const { myClassFactory } = registry.export();
+
+myClassFactory.create(123, 'hello', true); // logs "test: 123 hello true"
+```
+
+##### Dependent class factories
+
+> The name of the factory is automatically generated from the class name.
+
+```js
+class Transformer {
+    transform(value) {
+        return '(' + value + ')';
+    }
+}
+
+class MyClass {
+    constructor(a, b, c, { transformer }) {
+        console.log(
+            'test:',
+            transformer.transform(a),
+            transformer.transform(b),
+            transformer.transform(c)
+        );
+    }
+}
+
+registry.registerInstance(new Transformer());
+registry.registerFactory(MyClass, (deps, ...args) => new MyClass(...args, deps));
+
+const { myClassFactory } = registry.export();
+
+myClassFactory.create(123, 'hello', true); // logs "test: (123) (hello) (true)"
+```
+
+##### Named factories
+
+```js
+registry.registerInstance('translator', {
+    translate(key, variables) {
+        if (key === 'greeting') {
+            return `Hello, ${variables.name}!`;
+        }
+
+        throw new Error('Unknown key: ' + key);
+    }
+})
+
+registry.registerFactory(
+    'greetingFactory',
+    ({ translator }, name) => translator.translate('greeting', { name })
+);
+
+const { greetingFactory } = registry.export();
+
+console.log(greetingFactory.create('John Doe')); // logs "Hello, John Doe!"
+```
+
+#### Importing registries
+
+```js
+registry1.registerValue('appName', 'My App');
+
+registry2.registerFactory('welcomeFactory', ({ appName }) => `Welcome to ${appName}!`);
+registry2.import(registry1);
+
+const { welcomeFactory } = registry2.export();
+
+console.log(welcomeFactory.create()); // logs "Welcome to My App!"
+```
+
+> Imported factories can use dependencies of the new registry
+
 ## The problem
 
 When using dependency injection or writing unit tests, you might notice that your dependency hierarchy slowly becomes bloated and hard to maintain.
@@ -233,135 +365,3 @@ As you can see:
 > You only really need it in `main` part of your application, which initializes the application, configures routes, creates connections to databases, etc. (like `app.js`, routers and controllers).
 >
 > In terms of your business logic, it should behave as if those factories do actually exist in your code.
-
-## Usage
-
-### Installation
-
-```
-npm i @vitalyrudenko/dependency-registry
-```
-
-### Initialize the registry
-
-```js
-const { DependencyRegistry } = require('@vitalyrudenko/dependency-registry');
-
-const registry = new DependencyRegistry();
-```
-
-#### Values
-
-```js
-registry.registerValue('externalApiKey', config.external.apiKey);
-
-const { externalApiKey } = registry.export();
-```
-
-#### Instances
-
-##### Class instances
-
-> The name of the instance is automatically generated from the class name.
-
-```js
-registry.registerInstance(new House());
-
-const { house } = registry.export();
-```
-
-##### Named instances
-```js
-registry.registerInstance('myHouse', new House());
-registry.registerInstance('pgPool', pg.createPool());
-
-const { myHouse, pgPool } = registry.export();
-```
-
-#### Factories
-
-##### Simple class factories
-
-> The name of the factory is automatically generated from the class name.
-
-```js
-class MyClass {
-    constructor(a, b, c) {
-        console.log('test:', a, b, c);
-    }
-}
-
-registry.registerFactory(MyClass);
-
-const { myClassFactory } = registry.export();
-
-myClassFactory.create(123, 'hello', true); // logs "test: 123 hello true"
-```
-
-##### Dependent class factories
-
-> The name of the factory is automatically generated from the class name.
-
-```js
-class Transformer {
-    transform(value) {
-        return '(' + value + ')';
-    }
-}
-
-class MyClass {
-    constructor(a, b, c, { transformer }) {
-        console.log(
-            'test:',
-            transformer.transform(a),
-            transformer.transform(b),
-            transformer.transform(c)
-        );
-    }
-}
-
-registry.registerInstance(new Transformer());
-registry.registerFactory(MyClass, (deps, ...args) => new MyClass(...args, deps));
-
-const { myClassFactory } = registry.export();
-
-myClassFactory.create(123, 'hello', true); // logs "test: (123) (hello) (true)"
-```
-
-##### Named factories
-
-```js
-registry.registerInstance('translator', {
-    translate(key, variables) {
-        if (key === 'greeting') {
-            return `Hello, ${variables.name}!`;
-        }
-
-        throw new Error('Unknown key: ' + key);
-    }
-})
-
-registry.registerFactory(
-    'greetingFactory',
-    ({ translator }, name) => translator.translate('greeting', { name })
-);
-
-const { greetingFactory } = registry.export();
-
-console.log(greetingFactory.create('John Doe')); // logs "Hello, John Doe!"
-```
-
-#### Importing registries
-
-```js
-registry1.registerValue('appName', 'My App');
-
-registry2.registerFactory('welcomeFactory', ({ appName }) => `Welcome to ${appName}!`);
-registry2.import(registry1);
-
-const { welcomeFactory } = registry2.export();
-
-console.log(welcomeFactory.create()); // logs "Welcome to My App!"
-```
-
-> Imported factories can use dependencies of the new registry

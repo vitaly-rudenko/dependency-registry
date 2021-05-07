@@ -1,11 +1,19 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "@vitalyrudenko/dependency-registry",
     "description": "Tiny JavaScript dependency registry",
     "author": "Vitaly Rudenko",
     "license": "MIT",
     "main": "index.js",
     "keywords": ["dependency injection", "dependency", "injection", "ioc", "container", "javascript"],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vitaly-rudenko/dependency-registry.git"
+    },
+    "bugs": {
+        "url": "https://github.com/vitaly-rudenko/dependency-registry/issues"
+    },
+    "homepage": "https://github.com/vitaly-rudenko/dependency-registry#readme",
     "scripts": {
         "test": "jasmine --config=spec/support/jasmine.json",
         "test:watch": "nodemon -x 'npm test'",
