@@ -52,7 +52,7 @@ const { townFactory, personFactory } = registry.export();
 
 const town = townFactory.create();
 
-const owner = personFactory.create('Jon Doe');
+const owner = personFactory.create('John Doe');
 town.buildHouse(owner);
 
 const [house] = town.getHouses();
