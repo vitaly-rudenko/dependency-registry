@@ -22,12 +22,17 @@ const PROVIDED_SECURITY_API_KEY = 'provided-security-api-key-12345';
 
 const registry = new DependencyRegistry();
 
+registry.registerValue('providedSecurityApiKey', PROVIDED_SECURITY_API_KEY);
+
 registry.registerFactory(Town, (deps) => new Town(deps));
 registry.registerFactory(House, (deps, attributes) => new House(attributes, deps));
 registry.registerFactory(Window, (deps) => new Window(deps));
 registry.registerFactory(WindowHandle, (deps) => new WindowHandle(deps)); 
 
-registry.registerFactory('securityFactory', (_, attributes) => new ProvidedSecurity(attributes, { apiKey: PROVIDED_SECURITY_API_KEY }))
+registry.registerFactory(
+    'securityFactory',
+    ({ providedSecurityApiKey }, attributes) => new ProvidedSecurity(attributes, { apiKey: providedSecurityApiKey })
+);
 
 registry.registerFactory(Person);
 registry.registerFactory(Door);
