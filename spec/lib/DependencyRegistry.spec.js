@@ -8,6 +8,87 @@ describe('DependencyRegistry', () => {
         dependencyRegistry = new DependencyRegistry();
     });
 
+    describe('registerValue()', () => {
+        it('should register a value', () => {
+            const name = 'My App';
+            const description = 'This is my app!';
+            const keywords = ['my', 'app'];
+            const author = 'Me!';
+
+            dependencyRegistry.registerValue('appName', name);
+            dependencyRegistry.registerValue('app.description', description);
+            dependencyRegistry.registerValue('#keywords', keywords);
+            dependencyRegistry.registerValue('_author', author);
+
+            expect(dependencyRegistry.export().appName).toBe(name);
+            expect(dependencyRegistry.export()['app.description']).toBe(description);
+            expect(dependencyRegistry.export()['#keywords']).toBe(keywords);
+            expect(dependencyRegistry.export()['_author']).toBe(author);
+        });
+
+        it('should throw an error when the specified name is invalid', () => {
+            const value = 'fake value';
+
+            expect(() => dependencyRegistry.registerValue(123, value))
+                .toThrowError('Invalid value identifier: "123" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue({ hello: 'world' }, value))
+                .toThrowError('Invalid value identifier: "[object Object]" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue(null, value))
+                .toThrowError('Invalid value identifier: "null" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue(undefined, value))
+                .toThrowError('Invalid value identifier: "undefined" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue(true, value))
+                .toThrowError('Invalid value identifier: "true" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue('', value))
+                .toThrowError('Invalid value identifier: "" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue(Symbol('hello world'), value))
+                .toThrowError('Invalid value identifier: "Symbol(hello world)" (must be a string)');
+
+            expect(() => dependencyRegistry.registerValue([1, 2, 3], value))
+                .toThrowError('Invalid value identifier: "1,2,3" (must be a string)');
+        });
+
+        it('should throw an error when the specified value is invalid', () => {
+            expect(() => dependencyRegistry.registerValue('value', undefined))
+                .toThrowError('Invalid value: "undefined"');
+        });
+
+        it('should throw an error when value is already registered', () => {
+            dependencyRegistry.registerValue('name', 'My App');
+            dependencyRegistry.registerValue('description', 'This is my app!');
+            dependencyRegistry.registerValue('author', 'Me!');
+
+            expect(() => dependencyRegistry.registerValue('name', null))
+                .toThrowError('Dependency is already registered: "name"');
+            expect(() => dependencyRegistry.registerValue('name', 'My App'))
+                .toThrowError('Dependency is already registered: "name"');
+            expect(() => dependencyRegistry.registerValue('name', 'My Other App'))
+                .toThrowError('Dependency is already registered: "name"');
+
+            expect(() => dependencyRegistry.registerValue('description', 'This is not my app!'))
+                .toThrowError('Dependency is already registered: "description"');
+            expect(() => dependencyRegistry.registerValue('author', 'Not me!'))
+                .toThrowError('Dependency is already registered: "author"');
+        });
+
+        it('should throw an error when arguments count is invalid', () => {
+            const errorMessage = 'Invalid value registration arguments';
+
+            expect(() => dependencyRegistry.registerValue())
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerValue('hello', { fake: 'object' }, true))
+                .toThrowError(errorMessage);
+            expect(() => dependencyRegistry.registerValue('hello', { fake: 'object' }, true, 123))
+                .toThrowError(errorMessage);
+        });
+    });
+
     describe('registerInstance()', () => {
         it('should register an object by its class name (instance)', () => {
             class MyClass {}
@@ -92,6 +173,11 @@ describe('DependencyRegistry', () => {
 
             expect(() => dependencyRegistry.registerInstance([1, 2, 3], instance))
                 .toThrowError('Invalid instance identifier: "1,2,3" (must be a string)');
+        });
+
+        it('should throw an error when the specified instance is invalid', () => {
+            expect(() => dependencyRegistry.registerInstance('instance', undefined))
+                .toThrowError('Invalid instance: "undefined"');
         });
 
         it('should throw an error when instance is already registered', () => {
