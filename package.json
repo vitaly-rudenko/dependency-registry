@@ -5,6 +5,7 @@
     "author": "Vitaly Rudenko",
     "license": "MIT",
     "main": "index.js",
+    "keywords": ["dependency injection", "dependency", "injection", "ioc", "container", "javascript"],
     "scripts": {
         "test": "jasmine --config=spec/support/jasmine.json",
         "test:watch": "nodemon -x 'npm test'",
