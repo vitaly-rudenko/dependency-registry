@@ -10,6 +10,6 @@
   "author": "Vitaly Rudenko <maurice.dederick@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@vitalyrudenko/dependency-registry": "1.0.0-pre.2"
+    "@vitalyrudenko/dependency-registry": "^1.0.0"
   }
 }
