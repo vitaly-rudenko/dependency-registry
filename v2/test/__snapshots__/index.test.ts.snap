@@ -16,6 +16,18 @@ exports[`DependencyRegistry factory() fails when name is invalid 7`] = `"Invalid
 
 exports[`DependencyRegistry factory() fails when name is invalid 8`] = `"Invalid factory name: 1,2,3"`;
 
+exports[`DependencyRegistry factory() fails when provided class is not valid 1`] = `"Invalid factory class: Object"`;
+
+exports[`DependencyRegistry factory() fails when provided class is not valid 2`] = `"Invalid factory class: Array"`;
+
+exports[`DependencyRegistry factory() fails when provided class is not valid 3`] = `"Invalid factory class: Number"`;
+
+exports[`DependencyRegistry factory() fails when provided class is not valid 4`] = `"Invalid factory class: String"`;
+
+exports[`DependencyRegistry factory() fails when provided class is not valid 5`] = `"Invalid factory class: Symbol"`;
+
+exports[`DependencyRegistry factory() fails when provided class is not valid 6`] = `"Invalid factory class: Function"`;
+
 exports[`DependencyRegistry factory() fails when value is invalid 1`] = `"Factory value cannot be undefined"`;
 
 exports[`DependencyRegistry factory() fails when value is invalid 2`] = `"Invalid factory value: name"`;

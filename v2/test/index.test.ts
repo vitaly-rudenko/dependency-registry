@@ -35,6 +35,49 @@ describe('DependencyRegistry', () => {
     expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Unknown dependency: "name""`)
   })
 
+  it('throws an error for unsupported actions', () => {
+    expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(name)"`)
+  })
+
+  it('supports spread operator, iterators and "has" operator', () => {
+    registry.value('firstName', 'John')
+    registry.lazy('lastName', () => 'Doe')
+    // @ts-expect-error Cannot infer name
+    registry.factory('fullName', () => 'John Doe')
+
+    const { firstName, ...rest } = registry.export()
+
+    expect(firstName).toBe('John')
+    expect(rest).toEqual({ lastName: 'Doe', createFullName: expect.any(Function) })
+
+    expect('firstName' in registry.export()).toBe(true)
+    expect('lastName' in registry.export()).toBe(true)
+    expect('createFullName' in registry.export()).toBe(true)
+    expect('middleName' in registry.export()).toBe(false)
+
+    expect(Object.entries(registry.export())).toEqual([
+      ['firstName', 'John'],
+      ['lastName', 'Doe'],
+      ['createFullName', expect.any(Function)],
+    ])
+
+    for (const item of registry.export()) {
+      expect(item).toEqual([expect.any(String), expect.anything()])
+    }
+
+    expect({...registry.export()}).toEqual({
+      firstName: 'John',
+      lastName: 'Doe',
+      createFullName: expect.any(Function),
+    })
+
+    expect([...registry.export()]).toEqual([
+      ['firstName', 'John'],
+      ['lastName', 'Doe'],
+      ['createFullName', expect.any(Function)],
+    ])
+  })
+
   describe('value()', () => {
     it.each(values)('registers a value', (value) => {
       registry.value('name', value)
@@ -165,6 +208,13 @@ describe('DependencyRegistry', () => {
       { hello: 'world' },
       Buffer.from('hello world'),
     ])('fails when value is invalid', (value) => {
+      // @ts-expect-error Cannot infer name
+      expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
+    })
+
+    it.each([
+      Object, Array, Number, String, Symbol, Function,
+    ])('fails when provided class is not valid', (value) => {
       // @ts-expect-error Cannot infer name
       expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
     })

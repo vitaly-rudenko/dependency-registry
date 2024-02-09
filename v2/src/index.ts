@@ -7,10 +7,6 @@ export type Factory<T> = T extends { new (...args: infer C): infer I }
   : never
 
 function isClass(value: unknown): value is ({ new (...args: unknown[]): unknown }) {
-  if (!value || INVALID_CLASSES.includes(value)) {
-    return false
-  }
-
   const properties = Object.getOwnPropertyNames(value)
   return properties.includes('prototype') && !properties.includes('arguments')
 }
@@ -19,11 +15,31 @@ function capitalize<T extends string>(input: T): Capitalize<T> {
   return input[0].toUpperCase() + input.slice(1) as Capitalize<T>
 }
 
-export class DependencyRegistry<T extends Record<string, unknown>> {
+export class DependencyRegistry<T extends { [name: string]: unknown }> {
   private readonly dependencies = new Map<keyof T, T[keyof T] | LazyValue<T>>()
   private readonly lazyDependencies = new Set<keyof T>()
   private readonly proxy = new Proxy({}, {
+    ownKeys: () => {
+      return [...this.dependencies.keys()] as string[]
+    },
+    has: (_, name) => {
+      return this.dependencies.has(name as string)
+    },
+    getOwnPropertyDescriptor: () => {
+      return {
+        value: null,
+        enumerable: true,
+        configurable: true,
+      }
+    },
     get: (_, name) => {
+      if (name === Symbol.iterator) {
+        return () => {
+          const keys = this.dependencies.entries()
+          return { next: () => keys.next() }
+        }
+      }
+
       if (!name) {
         throw new Error('Unsupported action')
       }
@@ -104,6 +120,10 @@ export class DependencyRegistry<T extends Record<string, unknown>> {
     }
 
     if (isClass(value)) {
+      if (INVALID_CLASSES.includes(value)) {
+        throw new Error(`Invalid factory class: ${String(value.name)}`)
+      }
+
       // @ts-expect-error Cannot infer type
       this.dependencies.set(factoryName, (...args: C) => new value(this.export(), ...args))
     } else if (typeof value === 'function') {

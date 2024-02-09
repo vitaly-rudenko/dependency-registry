@@ -4,7 +4,7 @@
   "description": "Tiniest JavaScript dependency registry",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "eslint ./src --ext .ts",
     "build": "tsc"
   },
