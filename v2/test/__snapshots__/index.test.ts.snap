@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DependencyRegistry factory() fails when name is invalid 1`] = `"Invalid factory name: undefined"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 2`] = `"Invalid factory name: null"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 3`] = `"Invalid factory name: "`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 4`] = `"Invalid factory name: true"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 5`] = `"Invalid factory name: Symbol(hello world)"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 6`] = `"Invalid factory name: 123"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 7`] = `"Invalid factory name: [object Object]"`;
+
+exports[`DependencyRegistry factory() fails when name is invalid 8`] = `"Invalid factory name: 1,2,3"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 1`] = `"Factory value cannot be undefined"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 2`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 3`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 4`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 5`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 6`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry factory() fails when value is invalid 7`] = `"Invalid factory value: name"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 1`] = `"Invalid name: undefined"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 2`] = `"Invalid name: null"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 3`] = `"Invalid name: "`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 4`] = `"Invalid name: true"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 5`] = `"Invalid name: Symbol(hello world)"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 6`] = `"Invalid name: 123"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 7`] = `"Invalid name: [object Object]"`;
+
+exports[`DependencyRegistry lazy() fails when name is invalid 8`] = `"Invalid name: 1,2,3"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 1`] = `"Invalid name: undefined"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 2`] = `"Invalid name: null"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 3`] = `"Invalid name: "`;
+
+exports[`DependencyRegistry value() fails when name is invalid 4`] = `"Invalid name: true"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 5`] = `"Invalid name: Symbol(hello world)"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 6`] = `"Invalid name: 123"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 7`] = `"Invalid name: [object Object]"`;
+
+exports[`DependencyRegistry value() fails when name is invalid 8`] = `"Invalid name: 1,2,3"`;
