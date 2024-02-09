@@ -139,8 +139,8 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
     }
   }
 
-  export(): T {
-    return this.proxy as T
+  export(options?: { plain: boolean }): T {
+    return options?.plain ? { ...this.proxy } : this.proxy
   }
 
   private isLazy<Name extends keyof T>(name: Name, value: unknown): value is LazyValue<T> {

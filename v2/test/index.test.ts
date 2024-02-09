@@ -31,53 +31,67 @@ describe('DependencyRegistry', () => {
     registry = new DependencyRegistry()
   })
 
-  it('throws an error for unknown dependencies', () => {
-    expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Unknown dependency: "name""`)
-  })
-
-  it('throws an error for unsupported actions', () => {
-    expect(() => registry.export()['']).toThrowErrorMatchingInlineSnapshot(`"Unsupported action"`)
-    expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(name)"`)
-    expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(Symbol.asyncIterator)"`)
-  })
-
-  it('supports spread operator, iterators and "has" operator', () => {
-    registry.value('firstName', 'John')
-    registry.lazy('lastName', () => 'Doe')
-    // @ts-expect-error TODO
-    registry.factory('fullName', () => 'John Doe')
-
-    const { firstName, ...rest } = registry.export()
-
-    expect(firstName).toBe('John')
-    expect(rest).toEqual({ lastName: 'Doe', createFullName: expect.any(Function) })
-
-    expect('firstName' in registry.export()).toBe(true)
-    expect('lastName' in registry.export()).toBe(true)
-    expect('createFullName' in registry.export()).toBe(true)
-    expect('middleName' in registry.export()).toBe(false)
-
-    expect(Object.entries(registry.export())).toEqual([
-      ['firstName', 'John'],
-      ['lastName', 'Doe'],
-      ['createFullName', expect.any(Function)],
-    ])
-
-    for (const item of registry.export()) {
-      expect(item).toEqual([expect.any(String), expect.anything()])
-    }
-
-    expect({...registry.export()}).toEqual({
-      firstName: 'John',
-      lastName: 'Doe',
-      createFullName: expect.any(Function),
+  describe('export()', () => {
+    it('throws an error for unknown dependencies', () => {
+      expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Unknown dependency: "name""`)
     })
 
-    expect([...registry.export()]).toEqual([
-      ['firstName', 'John'],
-      ['lastName', 'Doe'],
-      ['createFullName', expect.any(Function)],
-    ])
+    it('throws an error for unsupported actions', () => {
+      expect(() => registry.export()['']).toThrowErrorMatchingInlineSnapshot(`"Unsupported action"`)
+      expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(name)"`)
+      expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(Symbol.asyncIterator)"`)
+    })
+
+    it('supports spread operator, iterators and "has" operator', () => {
+      registry.value('firstName', 'John')
+      registry.lazy('lastName', () => 'Doe')
+      // @ts-expect-error TODO
+      registry.factory('fullName', () => 'John Doe')
+
+      const { firstName, ...rest } = registry.export()
+
+      expect(firstName).toBe('John')
+      expect(rest).toStrictEqual({ lastName: 'Doe', createFullName: expect.any(Function) })
+
+      expect('firstName' in registry.export()).toBe(true)
+      expect('lastName' in registry.export()).toBe(true)
+      expect('createFullName' in registry.export()).toBe(true)
+      expect('middleName' in registry.export()).toBe(false)
+
+      expect(Object.entries(registry.export())).toStrictEqual([
+        ['firstName', 'John'],
+        ['lastName', 'Doe'],
+        ['createFullName', expect.any(Function)],
+      ])
+
+      for (const item of registry.export()) {
+        expect(item).toStrictEqual([expect.any(String), expect.anything()])
+      }
+
+      expect({...registry.export()}).toStrictEqual({
+        firstName: 'John',
+        lastName: 'Doe',
+        createFullName: expect.any(Function),
+      })
+
+      expect([...registry.export()]).toStrictEqual([
+        ['firstName', 'John'],
+        ['lastName', 'Doe'],
+        ['createFullName', expect.any(Function)],
+      ])
+    })
+
+    it('allows plain export', () => {
+      registry.value('hello', 'world')
+
+      const proxy = registry.export()
+      const plain = registry.export({ plain: true })
+
+      expect(proxy).not.toBe(plain)
+
+      expect(plain).toStrictEqual({ hello: 'world' })
+      expect(plain.goodbye).toBeUndefined()
+    })
   })
 
   describe('value()', () => {
@@ -94,7 +108,7 @@ describe('DependencyRegistry', () => {
 
       expect(() => registry.value('hello', 'there')).toThrowErrorMatchingInlineSnapshot(`"Value is already registered: hello"`)
 
-      expect(registry.export().hello).toEqual('world')
+      expect(registry.export().hello).toBe('world')
     })
 
     it.each(invalidNames)('fails when name is invalid', (name: any) => {
@@ -144,7 +158,7 @@ describe('DependencyRegistry', () => {
 
       expect(() => registry.lazy('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Lazy value is already registered: hello"`)
 
-      expect(registry.export().hello).toEqual('world')
+      expect(registry.export().hello).toBe('world')
     })
 
     it.each(invalidNames)('fails when name is invalid', (name: any) => {
@@ -193,7 +207,7 @@ describe('DependencyRegistry', () => {
       // @ts-expect-error TODO
       expect(() => registry.factory('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Factory is already registered: hello"`)
 
-      expect(registry.export().createHello()).toEqual('world')
+      expect(registry.export().createHello()).toBe('world')
     })
 
     it.each(invalidNames)('fails when name is invalid', (name: any) => {
