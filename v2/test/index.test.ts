@@ -36,13 +36,15 @@ describe('DependencyRegistry', () => {
   })
 
   it('throws an error for unsupported actions', () => {
+    expect(() => registry.export()['']).toThrowErrorMatchingInlineSnapshot(`"Unsupported action"`)
     expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(name)"`)
+    expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(Symbol.asyncIterator)"`)
   })
 
   it('supports spread operator, iterators and "has" operator', () => {
     registry.value('firstName', 'John')
     registry.lazy('lastName', () => 'Doe')
-    // @ts-expect-error Cannot infer name
+    // @ts-expect-error TODO
     registry.factory('fullName', () => 'John Doe')
 
     const { firstName, ...rest } = registry.export()
@@ -158,7 +160,7 @@ describe('DependencyRegistry', () => {
 
   describe('factory()', () => {
     it.each(values)('registers a factory', (value) => {
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       registry.factory('name', () => value)
 
       const { createName } = registry.export()
@@ -173,7 +175,7 @@ describe('DependencyRegistry', () => {
       }
 
       registry.value('firstName', 'John')
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       registry.factory('greeting', Greeting)
 
       const { createGreeting } = registry.export()
@@ -185,17 +187,17 @@ describe('DependencyRegistry', () => {
     })
 
     it('fails when value is already registered', () => {
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       registry.factory('hello', () => 'world')
 
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       expect(() => registry.factory('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Factory is already registered: hello"`)
 
       expect(registry.export().createHello()).toEqual('world')
     })
 
     it.each(invalidNames)('fails when name is invalid', (name: any) => {
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       expect(() => registry.factory(name, () => 'value')).toThrowErrorMatchingSnapshot()
     })
 
@@ -208,14 +210,14 @@ describe('DependencyRegistry', () => {
       { hello: 'world' },
       Buffer.from('hello world'),
     ])('fails when value is invalid', (value) => {
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
     })
 
     it.each([
       Object, Array, Number, String, Symbol, Function,
     ])('fails when provided class is not valid', (value) => {
-      // @ts-expect-error Cannot infer name
+      // @ts-expect-error TODO
       expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
     })
   })

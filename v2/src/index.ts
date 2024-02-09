@@ -15,19 +15,30 @@ function capitalize<T extends string>(input: T): Capitalize<T> {
   return input[0].toUpperCase() + input.slice(1) as Capitalize<T>
 }
 
+function validateName(name: unknown): asserts name is string {
+  if (!name || typeof name !== 'string') {
+    throw new Error(`Invalid name: ${String(name)}`)
+  }
+}
+
 export class DependencyRegistry<T extends { [name: string]: unknown }> {
   private readonly dependencies = new Map<keyof T, T[keyof T] | LazyValue<T>>()
   private readonly lazyDependencies = new Set<keyof T>()
-  private readonly proxy = new Proxy({}, {
+  // @ts-expect-error TODO
+  private readonly proxy = new Proxy<T>({} as T, {
     ownKeys: () => {
       return [...this.dependencies.keys()] as string[]
     },
     has: (_, name) => {
       return this.dependencies.has(name as string)
     },
-    getOwnPropertyDescriptor: () => {
+    getOwnPropertyDescriptor: (_, name) => {
+      if (typeof name !== 'string' || !this.dependencies.has(name)) {
+        return undefined
+      }
+
       return {
-        value: null,
+        value: this.proxy[name],
         enumerable: true,
         configurable: true,
       }
@@ -69,9 +80,7 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
   })
 
   value<Name extends Extract<keyof T, string>>(name: Name, value: T[Name]): void {
-    if (!name || typeof name !== 'string') {
-      throw new Error(`Invalid name: ${String(name)}`)
-    }
+    validateName(name)
 
     if (value === undefined) {
       throw new Error(`Lazy value cannot be undefined`)
@@ -85,9 +94,7 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
   }
 
   lazy<Name extends Extract<keyof T, string>>(name: Name, value: (dependencies: T) => T[Name]): void {
-    if (!name || typeof name !== 'string') {
-      throw new Error(`Invalid name: ${String(name)}`)
-    }
+    validateName(name)
 
     if (this.dependencies.has(name)) {
       throw new Error(`Lazy value is already registered: ${String(name)}`)
@@ -106,9 +113,7 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
       ? { new (dependencies: T, ...args: C): I } | ((dependencies: T, ...args: C) => I)
       : never,
   ): void {
-    if (!name || typeof name !== 'string') {
-      throw new Error(`Invalid factory name: ${String(name)}`)
-    }
+    validateName(name)
 
     if (value === undefined) {
       throw new Error(`Factory value cannot be undefined`)
@@ -124,10 +129,10 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
         throw new Error(`Invalid factory class: ${String(value.name)}`)
       }
 
-      // @ts-expect-error Cannot infer type
+      // @ts-expect-error TODO
       this.dependencies.set(factoryName, (...args: C) => new value(this.export(), ...args))
     } else if (typeof value === 'function') {
-      // @ts-expect-error Cannot infer type
+      // @ts-expect-error TODO
       this.dependencies.set(factoryName, (...args: C) => value(this.export(), ...args))
     } else {
       throw new Error(`Invalid factory value: ${String(name)}`)
