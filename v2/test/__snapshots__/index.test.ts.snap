@@ -1,75 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DependencyRegistry factory() fails when name is invalid 1`] = `"Invalid name: undefined"`;
+exports[`DependencyRegistry create() fails when name is invalid 1`] = `"Invalid name: 'undefined'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 2`] = `"Invalid name: null"`;
+exports[`DependencyRegistry create() fails when name is invalid 2`] = `"Invalid name: 'null'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 3`] = `"Invalid name: "`;
+exports[`DependencyRegistry create() fails when name is invalid 3`] = `"Invalid name: ''"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 4`] = `"Invalid name: true"`;
+exports[`DependencyRegistry create() fails when name is invalid 4`] = `"Invalid name: 'true'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 5`] = `"Invalid name: Symbol(hello world)"`;
+exports[`DependencyRegistry create() fails when name is invalid 5`] = `"Invalid name: 'Symbol(hello world)'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 6`] = `"Invalid name: 123"`;
+exports[`DependencyRegistry create() fails when name is invalid 6`] = `"Invalid name: '123'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 7`] = `"Invalid name: [object Object]"`;
+exports[`DependencyRegistry create() fails when name is invalid 7`] = `"Invalid name: '[object Object]'"`;
 
-exports[`DependencyRegistry factory() fails when name is invalid 8`] = `"Invalid name: 1,2,3"`;
+exports[`DependencyRegistry create() fails when name is invalid 8`] = `"Invalid name: '1,2,3'"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 1`] = `"Invalid factory class: Object"`;
+exports[`DependencyRegistry value() fails when name is invalid 1`] = `"Invalid name: 'undefined'"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 2`] = `"Invalid factory class: Array"`;
+exports[`DependencyRegistry value() fails when name is invalid 2`] = `"Invalid name: 'null'"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 3`] = `"Invalid factory class: Number"`;
+exports[`DependencyRegistry value() fails when name is invalid 3`] = `"Invalid name: ''"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 4`] = `"Invalid factory class: String"`;
+exports[`DependencyRegistry value() fails when name is invalid 4`] = `"Invalid name: 'true'"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 5`] = `"Invalid factory class: Symbol"`;
+exports[`DependencyRegistry value() fails when name is invalid 5`] = `"Invalid name: 'Symbol(hello world)'"`;
 
-exports[`DependencyRegistry factory() fails when provided class is not valid 6`] = `"Invalid factory class: Function"`;
+exports[`DependencyRegistry value() fails when name is invalid 6`] = `"Invalid name: '123'"`;
 
-exports[`DependencyRegistry factory() fails when value is invalid 1`] = `"Factory value cannot be undefined"`;
+exports[`DependencyRegistry value() fails when name is invalid 7`] = `"Invalid name: '[object Object]'"`;
 
-exports[`DependencyRegistry factory() fails when value is invalid 2`] = `"Invalid factory value: name"`;
+exports[`DependencyRegistry value() fails when name is invalid 8`] = `"Invalid name: '1,2,3'"`;
 
-exports[`DependencyRegistry factory() fails when value is invalid 3`] = `"Invalid factory value: name"`;
-
-exports[`DependencyRegistry factory() fails when value is invalid 4`] = `"Invalid factory value: name"`;
-
-exports[`DependencyRegistry factory() fails when value is invalid 5`] = `"Invalid factory value: name"`;
-
-exports[`DependencyRegistry factory() fails when value is invalid 6`] = `"Invalid factory value: name"`;
-
-exports[`DependencyRegistry factory() fails when value is invalid 7`] = `"Invalid factory value: name"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 1`] = `"Invalid name: undefined"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 2`] = `"Invalid name: null"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 3`] = `"Invalid name: "`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 4`] = `"Invalid name: true"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 5`] = `"Invalid name: Symbol(hello world)"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 6`] = `"Invalid name: 123"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 7`] = `"Invalid name: [object Object]"`;
-
-exports[`DependencyRegistry lazy() fails when name is invalid 8`] = `"Invalid name: 1,2,3"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 1`] = `"Invalid name: undefined"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 2`] = `"Invalid name: null"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 3`] = `"Invalid name: "`;
-
-exports[`DependencyRegistry value() fails when name is invalid 4`] = `"Invalid name: true"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 5`] = `"Invalid name: Symbol(hello world)"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 6`] = `"Invalid name: 123"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 7`] = `"Invalid name: [object Object]"`;
-
-exports[`DependencyRegistry value() fails when name is invalid 8`] = `"Invalid name: 1,2,3"`;
+exports[`DependencyRegistry values() fails when name is invalid 1`] = `"Invalid name: ''"`;

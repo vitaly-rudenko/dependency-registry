@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 
-import { DependencyRegistry } from '../src'
+import { DependencyRegistry } from '../src/index.js'
 
 const values = [
   123,
@@ -35,34 +33,33 @@ describe('DependencyRegistry', () => {
 
   describe('export()', () => {
     it('throws an error for unknown dependencies', () => {
-      expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Unknown dependency: "name""`)
+      expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Unknown dependency: 'name'"`)
     })
 
     it('throws an error for unsupported actions', () => {
       expect(() => registry.export()['']).toThrowErrorMatchingInlineSnapshot(`"Unsupported action"`)
-      expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(name)"`)
-      expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: Symbol(Symbol.asyncIterator)"`)
+      expect(() => registry.export()[Symbol('name')]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: 'Symbol(name)'"`)
+      expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: 'Symbol(Symbol.asyncIterator)'"`)
     })
 
     it('supports spread operator, iterators and "has" operator', () => {
       registry.value('firstName', 'John')
-      registry.lazy('lastName', () => 'Doe')
-      registry.factory('fullName', () => 'John Doe')
+      registry.values({ lastName: 'Doe', fullName: 'John Doe' })
 
       const { firstName, ...rest } = registry.export()
 
       expect(firstName).toBe('John')
-      expect(rest).toStrictEqual({ lastName: 'Doe', createFullName: expect.any(Function) })
+      expect(rest).toStrictEqual({ lastName: 'Doe', fullName: 'John Doe' })
 
       expect('firstName' in registry.export()).toBe(true)
       expect('lastName' in registry.export()).toBe(true)
-      expect('createFullName' in registry.export()).toBe(true)
+      expect('fullName' in registry.export()).toBe(true)
       expect('middleName' in registry.export()).toBe(false)
 
       expect(Object.entries(registry.export())).toStrictEqual([
         ['firstName', 'John'],
         ['lastName', 'Doe'],
-        ['createFullName', expect.any(Function)],
+        ['fullName', 'John Doe'],
       ])
 
       for (const item of registry.export()) {
@@ -72,26 +69,48 @@ describe('DependencyRegistry', () => {
       expect({...registry.export()}).toStrictEqual({
         firstName: 'John',
         lastName: 'Doe',
-        createFullName: expect.any(Function),
+        fullName: 'John Doe',
       })
 
       expect([...registry.export()]).toStrictEqual([
         ['firstName', 'John'],
         ['lastName', 'Doe'],
-        ['createFullName', expect.any(Function)],
+        ['fullName', 'John Doe'],
       ])
     })
+  })
 
-    it('allows plain export', () => {
-      registry.value('hello', 'world')
+  describe('create()', () => {
+    it.each(values)('registers a value', (value) => {
+      registry.create('name', () => value)
 
-      const proxy = registry.export()
-      const plain = registry.export({ plain: true })
+      const { name } = registry.export()
 
-      expect(proxy).not.toBe(plain)
+      expect(name).toBe(value)
+    })
 
-      expect(plain).toStrictEqual({ hello: 'world' })
-      expect(plain.goodbye).toBeUndefined()
+    it('allows using dependencies for value creation', () => {
+      registry.values({ firstName: 'John', lastName: 'Doe' })
+      registry.create('fullName', ({ firstName, lastName }) => `${firstName} ${lastName}`)
+
+      expect(registry.export().fullName).toBe('John Doe')
+    })
+
+    it('fails when value is already registered', () => {
+      registry.create('hello', () => 'world')
+
+      expect(() => registry.create('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Value is already registered: 'hello'"`)
+
+      expect(registry.export().hello).toBe('world')
+    })
+
+    it.each(invalidNames)('fails when name is invalid', (name) => {
+      // @ts-expect-error Invalid name values are used
+      expect(() => registry.create(name, () => 'value')).toThrowErrorMatchingSnapshot()
+    })
+
+    it('fails when value is invalid', () => {
+      expect(() => registry.create('name', () => undefined)).toThrowErrorMatchingInlineSnapshot(`"Value cannot be undefined"`)
     })
   })
 
@@ -107,126 +126,52 @@ describe('DependencyRegistry', () => {
     it('fails when value is already registered', () => {
       registry.value('hello', 'world')
 
-      expect(() => registry.value('hello', 'there')).toThrowErrorMatchingInlineSnapshot(`"Value is already registered: hello"`)
+      expect(() => registry.value('hello', 'there')).toThrowErrorMatchingInlineSnapshot(`"Value is already registered: 'hello'"`)
 
       expect(registry.export().hello).toBe('world')
     })
 
     it.each(invalidNames)('fails when name is invalid', (name) => {
+      // @ts-expect-error Invalid name values are used
       expect(() => registry.value(name, 'value')).toThrowErrorMatchingSnapshot()
     })
 
     it('fails when value is invalid', () => {
-      expect(() => registry.value('name', undefined)).toThrowErrorMatchingInlineSnapshot(`"Lazy value cannot be undefined"`)
+      expect(() => registry.value('name', undefined)).toThrowErrorMatchingInlineSnapshot(`"Value cannot be undefined"`)
     })
   })
 
-  describe('lazy()', () => {
-    it.each(values)('registers a lazy value', (value) => {
-      registry.lazy('name', () => value)
+  describe('values()', () => {
+    it.each(values)('registers values', (value) => {
+      registry.values({ name: value })
 
       const { name } = registry.export()
 
       expect(name).toBe(value)
     })
 
-    it('initializes lazy value once when accessed', () => {
-      const spy = jest.fn(() => 'value')
+    it('registers multiple values', () => {
+      registry.values({ firstName: 'John', lastName: 'Doe' })
 
-      registry.lazy('name', () => spy())
+      const { firstName, lastName } = registry.export()
 
-      const exported = registry.export()
-
-      expect(spy).not.toHaveBeenCalled()
-
-      expect(exported.name).toBe('value')
-      expect(exported.name).toBe('value')
-      expect(exported.name).toBe('value')
-
-      expect(spy).toHaveBeenCalledTimes(1)
-    })
-
-    it('initializes lazy value with dependencies', () => {
-      registry.value('firstName', 'John')
-      registry.lazy('lastName', () => 'Doe')
-      registry.lazy('fullName', ({ firstName, lastName }) => `${firstName} ${lastName}`)
-
-      expect(registry.export().fullName).toBe('John Doe')
+      expect({ firstName, lastName }).toStrictEqual({ firstName: 'John', lastName: 'Doe' })
     })
 
     it('fails when value is already registered', () => {
-      registry.lazy('hello', () => 'world')
+      registry.values({ hello: 'world' })
 
-      expect(() => registry.lazy('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Lazy value is already registered: hello"`)
+      expect(() => registry.values({ hello: 'world' })).toThrowErrorMatchingInlineSnapshot(`"Value is already registered: 'hello'"`)
 
       expect(registry.export().hello).toBe('world')
     })
 
-    it.each(invalidNames)('fails when name is invalid', (name) => {
-      expect(() => registry.lazy(name, () => 'value')).toThrowErrorMatchingSnapshot()
+    it('fails when name is invalid', () => {
+      expect(() => registry.values({ '': 'value' })).toThrowErrorMatchingSnapshot()
     })
 
     it('fails when value is invalid', () => {
-      registry.lazy('name', () => undefined)
-
-      expect(() => registry.export().name).toThrowErrorMatchingInlineSnapshot(`"Lazy value is undefined: name"`)
-    })
-  })
-
-  describe('factory()', () => {
-    it.each(values)('registers a factory', (value) => {
-      registry.factory('name', () => value)
-
-      const { createName } = registry.export()
-
-      expect(createName()).toBe(value)
-    })
-
-    it('creates a factory from a class', () => {
-      class Greeting {
-        constructor(readonly dependencies, readonly lastName: string) {}
-        generate() { return `Hello, ${this.dependencies.firstName} ${this.lastName}!` }
-      }
-
-      registry.value('firstName', 'John')
-      registry.factory('greeting', Greeting)
-
-      const { createGreeting } = registry.export()
-
-      const greeting = createGreeting('Doe')
-
-      expect(greeting).toBeInstanceOf(Greeting)
-      expect(greeting.generate()).toBe('Hello, John Doe!')
-    })
-
-    it('fails when value is already registered', () => {
-      registry.factory('hello', () => 'world')
-
-      expect(() => registry.factory('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Factory is already registered: hello"`)
-
-      expect(registry.export().createHello()).toBe('world')
-    })
-
-    it.each(invalidNames)('fails when name is invalid', (name) => {
-      expect(() => registry.factory(name, () => 'value')).toThrowErrorMatchingSnapshot()
-    })
-
-    it.each([
-      undefined,
-      123,
-      true,
-      [1, 2, 3],
-      'hello world',
-      { hello: 'world' },
-      Buffer.from('hello world'),
-    ])('fails when value is invalid', (value) => {
-      expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
-    })
-
-    it.each([
-      Object, Array, Number, String, Symbol, Function,
-    ])('fails when provided class is not valid', (value) => {
-      expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
+      expect(() => registry.values({ name: undefined })).toThrowErrorMatchingInlineSnapshot(`"Value cannot be undefined"`)
     })
   })
 })

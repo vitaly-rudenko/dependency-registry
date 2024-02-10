@@ -1,8 +1,10 @@
 {
   "name": "@vitalyrudenko/dependency-registry",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "Tiniest JavaScript dependency registry",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "test": "jest --coverage",
     "test:validate": "tsc -p tsconfig.validate.json",
