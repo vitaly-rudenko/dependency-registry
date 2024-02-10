@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --coverage",
+    "test:validate": "tsc -p tsconfig.validate.json",
     "lint": "eslint ./src --ext .ts",
-    "build": "tsc"
+    "build": "rimraf ./dist && tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",

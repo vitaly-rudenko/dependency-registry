@@ -2,13 +2,13 @@ const INVALID_CLASSES: unknown[] = [Object, Array, Number, String, Symbol, Funct
 
 type LazyValue<T> = (dependencies: T) => T[keyof T]
 
-export type Factory<T> = T extends { new (...args: infer C): infer I }
-  ? (...args: C) => I
-  : never
-
-function isClass(value: unknown): value is ({ new (...args: unknown[]): unknown }) {
+function isFactoryClass(value: unknown): value is new (...args: unknown[]) => unknown {
   const properties = Object.getOwnPropertyNames(value)
   return properties.includes('prototype') && !properties.includes('arguments')
+}
+
+function isFactoryFunction(value: unknown): value is (...args: unknown[]) => unknown {
+  return typeof value === 'function'
 }
 
 function capitalize<T extends string>(input: T): Capitalize<T> {
@@ -21,38 +21,27 @@ function validateName(name: unknown): asserts name is string {
   }
 }
 
-export class DependencyRegistry<T extends { [name: string]: unknown }> {
-  private readonly dependencies = new Map<keyof T, T[keyof T] | LazyValue<T>>()
-  private readonly lazyDependencies = new Set<keyof T>()
-  // @ts-expect-error TODO
-  private readonly proxy = new Proxy<T>({} as T, {
-    ownKeys: () => {
-      return [...this.dependencies.keys()] as string[]
-    },
-    has: (_, name) => {
-      return this.dependencies.has(name as string)
-    },
+export class DependencyRegistry<T extends object> {
+  private readonly dependencies = new Map<string, unknown>()
+  private readonly lazyDependencies = new Set<string>()
+  private readonly proxy = new Proxy({} as T, {
+    ownKeys: () => [...this.dependencies.keys()],
+    has: (_, name) => typeof name === 'string' && this.dependencies.has(name),
     getOwnPropertyDescriptor: (_, name) => {
-      if (typeof name !== 'string' || !this.dependencies.has(name)) {
-        return undefined
-      }
-
-      return {
-        value: this.proxy[name],
-        enumerable: true,
-        configurable: true,
-      }
+      return typeof name === 'string' && this.dependencies.has(name)
+        ? { enumerable: true, configurable: true }
+        : undefined
     },
     get: (_, name) => {
-      if (name === Symbol.iterator) {
-        return () => {
-          const keys = this.dependencies.entries()
-          return { next: () => keys.next() }
-        }
-      }
-
       if (!name) {
         throw new Error('Unsupported action')
+      }
+
+      if (name === Symbol.iterator) {
+        return () => {
+          const entries = this.dependencies.entries()
+          return { next: () => entries.next() }
+        }
       }
 
       if (typeof name !== 'string') {
@@ -105,12 +94,12 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
   }
 
   factory<
-    Name extends { [K in keyof T]: K extends `create${infer N}` ? Uncapitalize<N> : never }[keyof T],
-    FactoryName extends keyof T = `create${Capitalize<Name>}`
+    Name extends { [K in keyof T]: K extends `create${infer N}` ? Uncapitalize<N> : never }[Extract<keyof T, string>],
+    FactoryName extends `create${Capitalize<Name>}`
   >(
     name: Name,
-    value: T[FactoryName] extends (...args: infer C) => infer I
-      ? { new (dependencies: T, ...args: C): I } | ((dependencies: T, ...args: C) => I)
+    value: T extends { [name in FactoryName]: (...args: infer C) => infer I }
+      ? (new (dependencies: T, ...args: C) => I) | ((dependencies: T, ...args: C) => I)
       : never,
   ): void {
     validateName(name)
@@ -119,21 +108,19 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
       throw new Error(`Factory value cannot be undefined`)
     }
 
-    const factoryName = `create${capitalize(name)}` as FactoryName
+    const factoryName = `create${capitalize(name)}`
     if (this.dependencies.has(factoryName)) {
       throw new Error(`Factory is already registered: ${String(name)}`)
     }
 
-    if (isClass(value)) {
+    if (isFactoryClass(value)) {
       if (INVALID_CLASSES.includes(value)) {
         throw new Error(`Invalid factory class: ${String(value.name)}`)
       }
 
-      // @ts-expect-error TODO
-      this.dependencies.set(factoryName, (...args: C) => new value(this.export(), ...args))
-    } else if (typeof value === 'function') {
-      // @ts-expect-error TODO
-      this.dependencies.set(factoryName, (...args: C) => value(this.export(), ...args))
+      this.dependencies.set(factoryName, (...args: unknown[]) => new value(this.export(), ...args))
+    } else if (isFactoryFunction(value)) {
+      this.dependencies.set(factoryName, (...args: unknown[]) => value(this.export(), ...args))
     } else {
       throw new Error(`Invalid factory value: ${String(name)}`)
     }
@@ -143,7 +130,7 @@ export class DependencyRegistry<T extends { [name: string]: unknown }> {
     return options?.plain ? { ...this.proxy } : this.proxy
   }
 
-  private isLazy<Name extends keyof T>(name: Name, value: unknown): value is LazyValue<T> {
+  private isLazy(name: string, value: unknown): value is LazyValue<T> {
     return this.lazyDependencies.has(name)
   }
 }

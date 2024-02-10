@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 
 import { DependencyRegistry } from '../src'
 
@@ -45,7 +47,6 @@ describe('DependencyRegistry', () => {
     it('supports spread operator, iterators and "has" operator', () => {
       registry.value('firstName', 'John')
       registry.lazy('lastName', () => 'Doe')
-      // @ts-expect-error TODO
       registry.factory('fullName', () => 'John Doe')
 
       const { firstName, ...rest } = registry.export()
@@ -111,7 +112,7 @@ describe('DependencyRegistry', () => {
       expect(registry.export().hello).toBe('world')
     })
 
-    it.each(invalidNames)('fails when name is invalid', (name: any) => {
+    it.each(invalidNames)('fails when name is invalid', (name) => {
       expect(() => registry.value(name, 'value')).toThrowErrorMatchingSnapshot()
     })
 
@@ -161,7 +162,7 @@ describe('DependencyRegistry', () => {
       expect(registry.export().hello).toBe('world')
     })
 
-    it.each(invalidNames)('fails when name is invalid', (name: any) => {
+    it.each(invalidNames)('fails when name is invalid', (name) => {
       expect(() => registry.lazy(name, () => 'value')).toThrowErrorMatchingSnapshot()
     })
 
@@ -174,7 +175,6 @@ describe('DependencyRegistry', () => {
 
   describe('factory()', () => {
     it.each(values)('registers a factory', (value) => {
-      // @ts-expect-error TODO
       registry.factory('name', () => value)
 
       const { createName } = registry.export()
@@ -184,12 +184,11 @@ describe('DependencyRegistry', () => {
 
     it('creates a factory from a class', () => {
       class Greeting {
-        constructor(readonly deps: any, readonly lastName: string) {}
-        generate() { return `Hello, ${this.deps.firstName} ${this.lastName}!` }
+        constructor(readonly dependencies, readonly lastName: string) {}
+        generate() { return `Hello, ${this.dependencies.firstName} ${this.lastName}!` }
       }
 
       registry.value('firstName', 'John')
-      // @ts-expect-error TODO
       registry.factory('greeting', Greeting)
 
       const { createGreeting } = registry.export()
@@ -201,17 +200,14 @@ describe('DependencyRegistry', () => {
     })
 
     it('fails when value is already registered', () => {
-      // @ts-expect-error TODO
       registry.factory('hello', () => 'world')
 
-      // @ts-expect-error TODO
       expect(() => registry.factory('hello', () => 'there')).toThrowErrorMatchingInlineSnapshot(`"Factory is already registered: hello"`)
 
       expect(registry.export().createHello()).toBe('world')
     })
 
-    it.each(invalidNames)('fails when name is invalid', (name: any) => {
-      // @ts-expect-error TODO
+    it.each(invalidNames)('fails when name is invalid', (name) => {
       expect(() => registry.factory(name, () => 'value')).toThrowErrorMatchingSnapshot()
     })
 
@@ -224,17 +220,13 @@ describe('DependencyRegistry', () => {
       { hello: 'world' },
       Buffer.from('hello world'),
     ])('fails when value is invalid', (value) => {
-      // @ts-expect-error TODO
       expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
     })
 
     it.each([
       Object, Array, Number, String, Symbol, Function,
     ])('fails when provided class is not valid', (value) => {
-      // @ts-expect-error TODO
       expect(() => registry.factory('name', value)).toThrowErrorMatchingSnapshot()
     })
   })
 })
-
-// TODO: test TS types
