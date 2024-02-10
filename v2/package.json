@@ -1,6 +1,6 @@
 {
   "name": "@vitalyrudenko/dependency-registry",
-  "version": "2.0.0",
+  "version": "2.0.0-beta.1",
   "description": "Tiniest JavaScript dependency registry",
   "main": "dist/index.js",
   "scripts": {
