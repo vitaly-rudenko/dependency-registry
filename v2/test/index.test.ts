@@ -42,7 +42,7 @@ describe('DependencyRegistry', () => {
       expect(() => registry.export()[Symbol.asyncIterator]).toThrowErrorMatchingInlineSnapshot(`"Unsupported action: 'Symbol(Symbol.asyncIterator)'"`)
     })
 
-    it('supports spread operator, iterators and "has" operator', () => {
+    it('supports spread operator, iterators and "in" operator', () => {
       registry.value('firstName', 'John')
       registry.values({ lastName: 'Doe', fullName: 'John Doe' })
 
@@ -51,10 +51,11 @@ describe('DependencyRegistry', () => {
       expect(firstName).toBe('John')
       expect(rest).toStrictEqual({ lastName: 'Doe', fullName: 'John Doe' })
 
-      expect('firstName' in registry.export()).toBe(true)
-      expect('lastName' in registry.export()).toBe(true)
-      expect('fullName' in registry.export()).toBe(true)
-      expect('middleName' in registry.export()).toBe(false)
+      const deps = registry.export()
+      expect('firstName' in deps).toBe(true)
+      expect('lastName' in deps).toBe(true)
+      expect('fullName' in deps).toBe(true)
+      expect('middleName' in deps).toBe(false)
 
       expect(Object.entries(registry.export())).toStrictEqual([
         ['firstName', 'John'],
